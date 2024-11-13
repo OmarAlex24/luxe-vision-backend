@@ -13,15 +13,13 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '21'
-        distribution: 'adopt'
+        distribution: 'temurin'
+        
+    - name: Grant execute permission for Maven wrapper
+      run: chmod +x mvnw
 
-    - name: Build with Maven
-      run: mvn clean install
-
-    - name: Start Spring Boot Application
-      run: mvn spring-boot:run &
-      env:
-        SPRING_PROFILES_ACTIVE: test
+    - name: Build project
+      run: ./mvnw clean package -DskipTests
 
     - name: Setup Node.js environment
       uses: actions/setup-node@v2
@@ -32,4 +30,4 @@ jobs:
       run: npm install -g apidog-cli
 
     - name: Running Test Scenario
-      run: apidog run https://api.apidog.com/api/v1/projects/718868/api-test/ci-config/362720/detail?token=xyd-7Hoa-HfGwh6Tj_RiY0 -r html,cli
+      run: apidog run https://api.apidog.com/api/v1/projects/718868/api-test/ci-config/362724/detail?token=xZixhKb3waPzxYgxJ7gNUw -r html,cli
