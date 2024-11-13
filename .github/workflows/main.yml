@@ -21,6 +21,12 @@ jobs:
     - name: Build project
       run: ./mvnw clean package -DskipTests
 
+    - name: Grant execute permission for jar
+      run: chmod +x ./target/backend*.jar
+
+    - name: Run jar
+      run: java -jar ./target/backend-0.0.1-SNAPSHOT.jar
+
     - name: Setup Node.js environment
       uses: actions/setup-node@v2
       with:
