@@ -9,6 +9,20 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+
+    - name: Build with Maven
+      run: mvn clean install
+
+    - name: Start Spring Boot Application
+      run: mvn spring-boot:run &
+      env:
+        SPRING_PROFILES_ACTIVE: test
+
     - name: Setup Node.js environment
       uses: actions/setup-node@v2
       with:
@@ -18,4 +32,4 @@ jobs:
       run: npm install -g apidog-cli
 
     - name: Running Test Scenario
-      run: apidog run https://api.apidog.com/api/v1/projects/718868/api-test/ci-config/362719/detail?token=xCGr959k-mCphDpA1s7LbB -r html,cli
+      run: apidog run https://api.apidog.com/api/v1/projects/718868/api-test/ci-config/362720/detail?token=xyd-7Hoa-HfGwh6Tj_RiY0 -r html,cli
