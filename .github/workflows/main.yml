@@ -21,18 +21,37 @@ jobs:
     - name: Build project
       run: ./mvnw clean package -DskipTests
 
-    - name: Grant execute permission for jar
-      run: chmod +x ./target/backend*.jar
-
-    - name: Run jar
-      run: java -jar ./target/backend-0.0.1-SNAPSHOT.jar
+    - name: Copy JAR to AWS EC2
+      env:
+        AWS_EC2_USER: ${{ secrets.AWS_EC2_USER }}
+        AWS_EC2_IP: ${{ secrets.AWS_EC2_IP }}
+        AWS_EC2_PATH: ${{ secrets.AWS_EC2_PATH }}
+      run: |
+        # Prepare the SSH key
+        echo "${{ secrets.AWS_EC2_KEY }}" > /tmp/aws_key.pem
+        chmod 400 /tmp/aws_key.pem
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.AWS_EC2_IP }} >> ~/.ssh/known_hosts
+  
+        # Copy JAR to EC2
+        scp -o StrictHostKeyChecking=no -i /tmp/aws_key.pem target/*.jar ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_IP }}:${{ secrets.AWS_EC2_PATH }}
+  
+        # Mensaje de conexión exitosa
+        echo "¡Se logró conectar a la instancia de AWS!"
+  
+        # Reiniciar la aplicación en la instancia de AWS
+        ssh -o StrictHostKeyChecking=no -i /tmp/aws_key.pem ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_IP }} << 'EOF'
+        pkill -f 'java -jar' || echo "No previous process running"
+        nohup java -jar ~/demo-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
+        EOF
 
     - name: Setup Node.js environment
       uses: actions/setup-node@v2
       with:
         node-version: '14'
+        
     - name: Install Apidog CLI
       run: npm install -g apidog-cli
 
     - name: Running Test Scenario
-      run: apidog run https://api.apidog.com/api/v1/projects/718868/api-test/ci-config/362724/detail?token=xUUfO7nb2cTGbM1YV69UTD -r html,cli
+      run: apidog run https://api.apidog.com/api/v1/projects/718868/api-test/ci-config/362725/detail?token=xXiWclOh1ZXPGILBooWc66 -r html,cli
