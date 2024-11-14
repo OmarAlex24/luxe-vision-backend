@@ -49,7 +49,7 @@ public class StudioController {
 
     @GetMapping
     public List<Studio> getAllStudios() {
-        return studioService.getAllStudios();
+        return new ArrayList();
     }
 
     @DeleteMapping("/{id}")
