@@ -5,7 +5,6 @@ import com.luxevision.backend.dto.auth.*;
 import com.luxevision.backend.exception.InvalidPasswordException;
 import com.luxevision.backend.exception.NoChangesMadeException;
 import com.luxevision.backend.exception.UserEmailAlreadyRegisteredException;
-import com.luxevision.backend.service.TokenService;
 import com.luxevision.backend.service.auth.JwtService;
 import com.luxevision.backend.dto.ApiError;
 import com.luxevision.backend.dto.RegisteredUser;
@@ -42,10 +41,10 @@ public class UserController {
     private JwtService jwtService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody @Valid SaveUser saveUser) throws UserEmailAlreadyRegisteredException {
+    public ResponseEntity<?> registerUser(@RequestBody SaveUser saveUser) {
 
         if (userService.isEmailTaken(saveUser.getEmail())) {
-            throw new UserEmailAlreadyRegisteredException();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already registered.");
         }
 
         if (!saveUser.getPassword().equals(saveUser.getRepeatedPassword())) {
